@@ -15,8 +15,7 @@
 4. [UI Mockup Definitions](#4-ui-mockup-definitions)
 5. [Navigation Skeleton](#5-navigation-skeleton)
 6. [Feature-to-OS Concept Traceability Matrix](#6-feature-to-os-concept-traceability-matrix)
-7. [Performance Profiling Plan](#7-performance-profiling-plan)
-8. [Glossary](#8-glossary)
+7. [Glossary](#8-glossary)
 
 ---
 ---
