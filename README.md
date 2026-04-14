@@ -14,8 +14,7 @@
 3. [Technical Requirements](#3-technical-requirements)
 4. [UI Mockup Definitions](#4-ui-mockup-definitions)
 5. [Navigation Skeleton](#5-navigation-skeleton)
-6. [Feature-to-OS Concept Traceability Matrix](#6-feature-to-os-concept-traceability-matrix)
-7. [Glossary](#8-glossary)
+6. [Glossary](#6-glossary)
 
 ---
 ---
@@ -433,34 +432,7 @@ When a local notification is tapped, `flutter_local_notifications` delivers a pa
 ---
 ---
 
-## 6 · Feature-to-OS Concept Traceability Matrix
-
-> The following matrix provides a complete, auditable mapping from every project feature to the Mobile OS concept it demonstrates, the screen(s) where it appears, and the routes involved.
-
-| Feature Area | OS Concept | Screen(s) | Route(s) |
-|---|---|---|---|
-| Email/Password Login | Security (Secure Storage) | Login | `/login` |
-| Biometric Unlock | Security (Biometrics), Permissions | Login | `/login` |
-| Session Token Management | Security (Sandboxing) | All (via AuthBloc) | All |
-| REST API Fetch | Networking (HTTP, Timeouts) | Home, Announcements, Events, Timetable | `/home`, `/announcements`, `/events`, `/timetable` |
-| Offline Data Serving | Storage & Sandboxing (DB) | All data screens | All |
-| Connectivity Monitoring | Networking (Awareness) | All data screens (Offline Banner) | All |
-| SharedPreferences | Storage (Key-Value) | Settings | `/settings` |
-| SQL Database Cache | Storage & Sandboxing | Announcements, Events, Timetable | Multiple |
-| JSON File Export | File I/O | Timetable | `/timetable` |
-| Camera/Gallery Access | Permissions (Runtime) | Event Detail | `/events/:id` |
-| GPS Location | Permissions (Runtime), Sensors | Campus Map | `/map` |
-| Accelerometer (Shake) | Sensors | Home, Announcements | `/home`, `/announcements` |
-| Local Notifications | Notifications (Scheduling) | Timetable | `/timetable` |
-| Notification Deep-Link | Notifications (Payload) | Any detail screen | Dynamic |
-| Background Fetch | Background Execution | Announcements (silent) | N/A (background) |
-| AppLifecycleState | App Lifecycle | Home (resume refresh) | `/home` |
-| Draft Persistence | App Lifecycle + Storage | Event notes | `/events/:id` |
-
----
----
-
-## 7 · Glossary
+## 6 · Glossary
 
 **BLoC** : Business Logic Component. A reactive state management pattern that separates business logic from the UI layer using events and states.
 
