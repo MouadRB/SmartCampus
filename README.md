@@ -69,8 +69,6 @@ The application must operate reliably in both online and offline modes, integrat
 
 ## 2 · Functional Requirements
 
-> Each requirement group is mapped to the Mobile OS concepts it demonstrates, satisfying Section 4 of the project specification.
-
 ---
 
 ### 2.1 : Authentication & Security
