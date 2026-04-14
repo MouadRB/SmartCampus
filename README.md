@@ -25,7 +25,6 @@
 
 This document constitutes the **Week 1 deliverable** for the SmartCampus Companion semester project. It formally defines the technical and functional requirements, specifies UI mockup structures for all primary screens, and outlines the navigation skeleton that will govern routing throughout the application.
 
-> Every feature is explicitly mapped to the Mobile OS concept it demonstrates, ensuring full traceability from user-facing functionality to underlying operating system principles.
 
 ---
 
