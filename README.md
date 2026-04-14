@@ -112,7 +112,7 @@ The application must operate reliably in both online and offline modes, integrat
 
 **FR-PER-01 · Preferences** : User preferences (theme mode, notification toggles, language selection) shall be stored using `SharedPreferences`.
 
-**FR-PER-02 · Structured Data** : Announcements, events, and timetable entries shall be persisted in a local SQL database (Drift or `sqflite`) within the app sandbox.
+**FR-PER-02 · Structured Data** : Announcements, events, and timetable entries shall be persisted in a local SQL database (Drift) within the app sandbox.
 
 **FR-PER-03 · Export Schedule** : The system shall provide an "Export Schedule" function that serializes the current timetable to a JSON file and saves it to the device's documents directory using `path_provider`.
 
