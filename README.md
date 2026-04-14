@@ -7,17 +7,6 @@
 
 ---
 
-## Table of Contents
-
-1. [Introduction](#1-introduction)
-2. [Functional Requirements](#2-functional-requirements)
-3. [Technical Requirements](#3-technical-requirements)
-4. [UI Mockup Definitions](#4-ui-mockup-definitions)
-5. [Navigation Skeleton](#5-navigation-skeleton)
-6. [Glossary](#6-glossary)
-
----
----
 
 ## 1 · Introduction
 
