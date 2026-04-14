@@ -222,7 +222,7 @@ lib/
 | **Connectivity** | `connectivity_plus` | Real-time network state monitoring |
 | **Secure Storage** | `flutter_secure_storage` | AES-encrypted key-value storage for tokens |
 | **Preferences** | `shared_preferences` | Lightweight storage for user settings |
-| **Database** | `drift` (or `sqflite`) | Typed SQL database for structured offline caching |
+| **Database** | `drift` | Typed SQL database for structured offline caching |
 | **Auth** | `local_auth` | Biometric authentication (fingerprint/face) |
 | **Camera** | `image_picker` | Camera and gallery access for photo attachments |
 | **Permissions** | `permission_handler` | Unified runtime permission request API |
