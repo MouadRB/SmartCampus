@@ -1,0 +1,25 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'event_media_model.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+EventMediaModel _$EventMediaModelFromJson(Map<String, dynamic> json) =>
+    EventMediaModel(
+      id: (json['id'] as num).toInt(),
+      eventId: (json['albumId'] as num).toInt(),
+      title: json['title'] as String,
+      imageUrl: json['url'] as String,
+      thumbnailUrl: json['thumbnailUrl'] as String,
+    );
+
+Map<String, dynamic> _$EventMediaModelToJson(EventMediaModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'albumId': instance.eventId,
+      'title': instance.title,
+      'url': instance.imageUrl,
+      'thumbnailUrl': instance.thumbnailUrl,
+    };
