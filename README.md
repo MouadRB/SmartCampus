@@ -59,7 +59,7 @@ The application must operate reliably in both online and offline modes, integrat
 | **State Management** | BLoC (`bloc` + `flutter_bloc`) | Event-driven paradigm with clear state transitions; facilitates unit testing of business logic. |
 | **Backend / REST API** | JSONPlaceholder (mock REST API) | Provides deterministic endpoints without infrastructure overhead. |
 | **Primary Device Features** | Camera/Gallery + Location (GPS) | Two distinct runtime permission flows satisfying the 2+ device feature requirement. |
-| **Local Database** | Drift (formerly Moor) or `sqflite` | Typed, relational persistence for structured offline caching. |
+| **Local Database** | Drift | Typed, relational persistence for structured offline caching. |
 | **Secure Storage** | `flutter_secure_storage` | Platform-native encrypted storage (Keychain on iOS, EncryptedSharedPreferences on Android). |
 
  **Architecture Note:** Dependencies flow strictly inward : Presentation depends on Domain; Domain has no external dependencies; Data implements Domain interfaces.
