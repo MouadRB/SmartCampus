@@ -109,7 +109,6 @@ The application must operate reliably in both online and offline modes, integrat
 
 ### 2.3 : Local Persistence
 
- **OS Concepts:** Storage & Sandboxing (file system locations, database isolation) · File I/O
 
 **FR-PER-01 · Preferences** : User preferences (theme mode, notification toggles, language selection) shall be stored using `SharedPreferences`.
 
