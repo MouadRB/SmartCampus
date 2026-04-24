@@ -1,0 +1,50 @@
+{
+  "elements": {
+    "AppDatabase": {
+      "id": {
+        "library_uri": "package:smart_campus/core/datasources/local/app_database.dart",
+        "name": "AppDatabase"
+      },
+      "declaration": {
+        "source_uri": "package:smart_campus/core/datasources/local/app_database.dart",
+        "offset": 779,
+        "name": "AppDatabase"
+      },
+      "references": [
+        {
+          "library_uri": "package:smart_campus/core/datasources/local/tables/announcements_table.dart",
+          "name": "announcements_table"
+        },
+        {
+          "library_uri": "package:smart_campus/core/datasources/local/tables/timetable_table.dart",
+          "name": "timetable_table"
+        }
+      ],
+      "type": "database",
+      "tables": [
+        {
+          "library_uri": "package:smart_campus/core/datasources/local/tables/announcements_table.dart",
+          "name": "announcements_table"
+        },
+        {
+          "library_uri": "package:smart_campus/core/datasources/local/tables/timetable_table.dart",
+          "name": "timetable_table"
+        }
+      ],
+      "views": [],
+      "includes": [],
+      "queries": [],
+      "schema_version": 1,
+      "daos": [],
+      "has_constructor_arg": true
+    }
+  },
+  "imports": [
+    "package:drift/drift.dart",
+    "package:drift/native.dart",
+    "package:path/path.dart",
+    "package:path_provider/path_provider.dart",
+    "package:smart_campus/core/datasources/local/tables/announcements_table.dart",
+    "package:smart_campus/core/datasources/local/tables/timetable_table.dart"
+  ]
+}

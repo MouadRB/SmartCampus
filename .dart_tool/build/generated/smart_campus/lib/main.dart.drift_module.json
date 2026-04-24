@@ -1,0 +1,7 @@
+{
+  "elements": {},
+  "imports": [
+    "package:flutter/material.dart",
+    "package:smart_campus/core/injection/injection_container.dart"
+  ]
+}

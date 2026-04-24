@@ -1,0 +1,18 @@
+{
+  "elements": {},
+  "imports": [
+    "package:get_it/get_it.dart",
+    "package:http/http.dart",
+    "package:smart_campus/core/datasources/remote_data_source.dart",
+    "package:smart_campus/features/announcements/data/repositories/announcements_repository_impl.dart",
+    "package:smart_campus/features/announcements/domain/repositories/announcements_repository.dart",
+    "package:smart_campus/features/auth/data/repositories/user_repository_impl.dart",
+    "package:smart_campus/features/auth/domain/repositories/user_repository.dart",
+    "package:smart_campus/features/events/data/repositories/events_repository_impl.dart",
+    "package:smart_campus/features/events/domain/repositories/events_repository.dart",
+    "package:smart_campus/features/map/data/repositories/map_repository_impl.dart",
+    "package:smart_campus/features/map/domain/repositories/map_repository.dart",
+    "package:smart_campus/features/timetable/data/repositories/tasks_repository_impl.dart",
+    "package:smart_campus/features/timetable/domain/repositories/tasks_repository.dart"
+  ]
+}
