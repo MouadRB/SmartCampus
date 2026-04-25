@@ -23,3 +23,14 @@ class NetworkException implements Exception {
   @override
   String toString() => 'NetworkException(message: $message)';
 }
+
+/// Thrown by any Local Data Source when a Drift read or write operation fails.
+/// The Repository layer catches this and maps it to a [CacheFailure].
+class CacheException implements Exception {
+  const CacheException({this.message = 'Local database operation failed'});
+
+  final String message;
+
+  @override
+  String toString() => 'CacheException(message: $message)';
+}

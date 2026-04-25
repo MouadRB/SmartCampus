@@ -1,0 +1,8 @@
+{
+  "elements": {},
+  "imports": [
+    "package:dartz/dartz.dart",
+    "package:smart_campus/core/error/failures.dart",
+    "package:smart_campus/features/auth/domain/entities/user_profile.dart"
+  ]
+}

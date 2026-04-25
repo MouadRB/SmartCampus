@@ -1,0 +1,1 @@
+{"valid_import":true,"imports":[{"uri":"package:json_annotation/json_annotation.dart","transitive":false},{"uri":"package:smart_campus/features/auth/domain/entities/user_profile.dart","transitive":false}],"elements":[]}

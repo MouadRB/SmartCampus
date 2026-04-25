@@ -1,0 +1,13 @@
+{
+  "elements": {},
+  "imports": [
+    "package:http/http.dart",
+    "package:smart_campus/core/error/exceptions.dart",
+    "package:smart_campus/core/network/network_client.dart",
+    "package:smart_campus/features/announcements/data/models/announcement_model.dart",
+    "package:smart_campus/features/auth/data/models/user_profile_model.dart",
+    "package:smart_campus/features/events/data/models/event_media_model.dart",
+    "package:smart_campus/features/map/data/models/campus_location_model.dart",
+    "package:smart_campus/features/timetable/data/models/campus_task_model.dart"
+  ]
+}

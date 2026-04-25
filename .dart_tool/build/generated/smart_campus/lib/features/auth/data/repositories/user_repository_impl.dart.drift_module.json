@@ -1,0 +1,11 @@
+{
+  "elements": {},
+  "imports": [
+    "package:dartz/dartz.dart",
+    "package:smart_campus/core/datasources/remote_data_source.dart",
+    "package:smart_campus/core/error/exceptions.dart",
+    "package:smart_campus/core/error/failures.dart",
+    "package:smart_campus/features/auth/domain/entities/user_profile.dart",
+    "package:smart_campus/features/auth/domain/repositories/user_repository.dart"
+  ]
+}

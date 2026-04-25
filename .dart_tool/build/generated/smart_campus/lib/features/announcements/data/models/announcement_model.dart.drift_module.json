@@ -1,0 +1,7 @@
+{
+  "elements": {},
+  "imports": [
+    "package:json_annotation/json_annotation.dart",
+    "package:smart_campus/features/announcements/domain/entities/announcement.dart"
+  ]
+}
