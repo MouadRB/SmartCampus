@@ -110,8 +110,7 @@ LazyDatabase _openConnection() {
 ---
 
 ### 1.2 The Dependency Invariant   Keeping Domain Pure
-
-The non-negotiable Sprint 2 invariant   **dependencies point inward only**   was preserved throughout Sprint 3 despite introducing a third-party persistence framework. Two mechanisms enforce this physically, not by convention.
+**dependencies point inward only**   was preserved 
 
 #### Mechanism 1: `@DataClassName`   The Naming Firewall
 
