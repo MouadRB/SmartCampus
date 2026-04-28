@@ -17,7 +17,7 @@
 
 #### Why Drift
 
-`drift` (formerly `moor`) was selected as the mandated local database solution for three specific reasons aligned with the project's architectural constraints:
+`drift` was selected as the mandated local database solution for three specific reasons aligned with the project's architectural constraints:
 
 1. **Type safety at compile time.** Drift generates fully typed Dart classes for every table row and query result. There are no untyped `Map<String, dynamic>` returns from the database   the same category of runtime `type cast` errors eliminated in Sprint 2 by `json_serializable` is eliminated here by `build_runner`-generated Drift code.
 
