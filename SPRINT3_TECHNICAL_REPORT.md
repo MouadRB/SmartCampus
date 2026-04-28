@@ -3,58 +3,17 @@
 
 ## Table of Contents
 
-1. [Executive Summary](#1-executive-summary)
-2. [Structural Architecture](#2-structural-architecture)
-3. [The Arbitration Logic (The "Brain")](#3-the-arbitration-logic-the-brain)
-4. [State Management & Offline Monitoring](#4-state-management--offline-monitoring)
-5. [Safety & Correctness Measures](#5-safety--correctness-measures)
+1. [Structural Architecture](#2-structural-architecture)
+2. [The Arbitration Logic (The "Brain")](#3-the-arbitration-logic-the-brain)
+3. [State Management & Offline Monitoring](#4-state-management--offline-monitoring)
+4. [Safety & Correctness Measures](#5-safety--correctness-measures)
 
 
 ---
 
-## 1. Executive Summary
+## 1. Structural Architecture
 
-Sprint 3 transformed SmartCampus Companion from a purely remote-dependent application into a production-grade **offline-first system**. The sprint was executed in four sequential phases, each building strictly upon the last, in accordance with the Clean Architecture-lite invariant established in Sprint 2.
-
-### Sprint Goal
-
-Establish a local SQLite persistence layer and a global network monitoring system so that the application continues to serve meaningful data when device connectivity is unavailable, without exposing any persistence or networking implementation details to the Domain layer.
-
-### Phases Completed
-
-| Phase | Deliverable | Scope |
-|---|---|---|
-| **Phase 1 · Local Persistence Foundation** | Drift table definitions, `AppDatabase`, `CacheException`, mappers, `LocalDataSource` interfaces + implementations | Announcements · Timetable |
-| **Phase 2 · Repository Arbitration** | `RepositoryImpl` classes updated to orchestrate remote + local data sources using a strict cache-fallback strategy | Announcements · Timetable |
-| **Phase 3 · BLoC Wiring & State Management** | `AnnouncementsBloc` and `TimetableBloc` with typed 5-state machines consuming `Either<Failure, T>` from repositories | Announcements · Timetable |
-| **Phase 4 · Global Offline Tracking** | `ConnectivityBloc` global singleton listening to the OS network hardware stream | App-wide |
-
-### Files Produced
-
-| Category | New Files | Modified Files |
-|---|---|---|
-| Drift tables + database | 3 (+ 1 generated `.g.dart`) |   |
-| Exception taxonomy |   | 1 (`exceptions.dart`) |
-| Failure base class |   | 1 (`failures.dart`) |
-| Mappers | 2 |   |
-| Local data sources | 2 |   |
-| Repository implementations |   | 2 |
-| Feature BLoCs (event + state + bloc) | 6 |   |
-| Connectivity BLoC (event + state + bloc) | 3 |   |
-| Dependency injection |   | 1 |
-| `pubspec.yaml` |   | 1 |
-| **Total** | **16 hand-authored** | **6** |
-
-### Verification Verdict
-
-`dart analyze lib/`   **zero issues** across the entire `lib/` directory.
-Domain boundary check   **CLEAN**: no `drift`, `datasources/local`, or cache-related symbols appear in any `domain/` directory.
-
----
-
-## 2. Structural Architecture
-
-### 2.1 The Persistence Layer
+### 1.1 The Persistence Layer
 
 #### Why Drift
 
@@ -150,7 +109,7 @@ LazyDatabase _openConnection() {
 
 ---
 
-### 2.2 The Dependency Invariant   Keeping Domain Pure
+### 1.2 The Dependency Invariant   Keeping Domain Pure
 
 The non-negotiable Sprint 2 invariant   **dependencies point inward only**   was preserved throughout Sprint 3 despite introducing a third-party persistence framework. Two mechanisms enforce this physically, not by convention.
 
@@ -206,11 +165,11 @@ All three checks return zero results. The Domain layer is provably uncontaminate
 
 ---
 
-## 3. The Arbitration Logic (The "Brain")
+## 2. The Arbitration Logic (The "Brain")
 
 The `RepositoryImpl` is the single point in the codebase that simultaneously holds references to both a `RemoteDataSource` and a `LocalDataSource`. Its responsibility is to act as the **single source of truth**: always try the network first, use the local cache as a fallback, and translate every possible failure mode into a typed `Failure` object before returning.
 
-### 3.1 The Three-Path Cache-Fallback Strategy
+### 2.1 The Three-Path Cache-Fallback Strategy
 
 The arbitration logic implements a strict decision tree with three mutually exclusive branches. There is no ambiguity between paths, and every path terminates with a typed `Either<Failure, T>`   the widget tree can never receive an unhandled exception.
 
@@ -285,7 +244,7 @@ class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
 }
 ```
 
-### 3.2 The Exception → Failure → BLoC State Translation Table
+### 2.2 The Exception → Failure → BLoC State Translation Table
 
 The 1:1 mapping established in Sprint 2 is extended to cover the local persistence layer. Every exception type maps to exactly one `Failure` type, which maps to exactly one BLoC state, which maps to exactly one UI behaviour.
 
@@ -298,7 +257,7 @@ The 1:1 mapping established in Sprint 2 is extended to cover the local persisten
 
 This mapping is mechanically verifiable: if a `SocketException` occurs anywhere in the system, it becomes a `NetworkException` in the data source, a `NetworkFailure` in the repository, an `AnnouncementsOffline` state in the BLoC, and the amber banner in the UI. There is no code path through which it can reach the widget tree as a crash or as a silent empty list.
 
-### 3.3 Explicit Design Decisions
+### 2.3 Explicit Design Decisions
 
 Two design decisions were made deliberately during Phase 2 after explicit discussion. Both are documented here so reviewers understand the intent, not just the implementation.
 
@@ -316,9 +275,9 @@ Two design decisions were made deliberately during Phase 2 after explicit discus
 
 ---
 
-## 4. State Management & Offline Monitoring
+## 3. State Management & Offline Monitoring
 
-### 4.1 `ConnectivityBloc`   Global Singleton
+### 3.1 `ConnectivityBloc`   Global Singleton
 
 #### Architecture
 
@@ -384,7 +343,7 @@ The eager `checkConnectivity().then(...)` call in the constructor fires a `Conne
 
 ---
 
-### 4.2 Feature BLoCs   `AnnouncementsBloc` and `TimetableBloc`
+### 3.2 Feature BLoCs   `AnnouncementsBloc` and `TimetableBloc`
 
 #### The 5-State Machine
 
@@ -425,15 +384,15 @@ The `Either.fold()` call is the entire error-handling logic. The repository guar
 
 ---
 
-## 5. Safety & Correctness Measures
+## 4. Safety & Correctness Measures
 
-### 5.1 `StreamSubscription` Lifecycle Management
+### 4.1 `StreamSubscription` Lifecycle Management
 
 The `ConnectivityBloc`'s `StreamSubscription<List<ConnectivityResult>>` is stored as a `late final` field and explicitly cancelled in the `close()` override. This is not optional hygiene   it is a correctness requirement.
 
 Without cancellation, the Dart runtime holds a reference from the OS stream to the `add()` method of the closed BLoC. Since `ConnectivityBloc` is a singleton registered in `GetIt`, this reference effectively lasts for the process lifetime on most platforms, preventing garbage collection of the BLoC and accumulating orphaned event dispatches if the BLoC is ever re-registered (e.g., in hot restart scenarios during development).
 
-### 5.2 Atomic Cache Writes
+### 4.2 Atomic Cache Writes
 
 The `LocalDataSource` implementations use a Drift `transaction()` wrapping a delete-all followed by a `batch.insertAll()`. This guarantees that the cache is never in a partial-write state:
 
@@ -451,11 +410,11 @@ await database.transaction(() async {
 
 If the app is killed between the `delete` and the `insertAll`, the transaction is rolled back by SQLite's write-ahead log. The next app launch finds the cache exactly as it was before the interrupted write   not empty, not partially written.
 
-### 5.3 `Equatable` on States   `BlocBuilder` Rebuild Optimisation
+### 4.3 `Equatable` on States   `BlocBuilder` Rebuild Optimisation
 
 All BLoC states extend `Equatable` and declare their payload fields in `props`. Without `Equatable`, Dart's default reference equality (`identical(a, b)`) means that two `AnnouncementsLoaded` emissions containing semantically identical lists would be treated as different objects, triggering a `BlocBuilder` rebuild even though the UI content would not change. With `Equatable`, the `BlocBuilder` performs value equality on `props`, suppressing redundant rebuilds and preventing unnecessary widget subtree invalidations.
 
-### 5.4 `abstract String get message` on the `Failure` Base Class
+### 4.4 `abstract String get message` on the `Failure` Base Class
 
 During Phase 3 implementation, `dart analyze` surfaced that `failure.message` was inaccessible from the abstract `Failure` type inside BLoC `fold()` handlers   `message` was defined on each concrete subclass but not on the base. The fix was a single-line addition to `failures.dart`:
 
@@ -470,98 +429,3 @@ In Dart, a `final String message` field on a concrete class implicitly satisfies
 
 ---
 
-## 6. Dependency Injection Graph   Final Tier Structure
-
-The `injection_container.dart` `init()` function registers all dependencies in strict **bottom-up order**: each tier's registrations may only call `sl<T>()` for types registered in a lower tier. Violating this order causes a runtime `GetIt: Object not registered` exception.
-
-| Tier | Registered Type | Concrete Implementation | Registration Mode | Rationale |
-|---|---|---|---|---|
-| **1 · External** | `http.Client` | `http.Client()` via `_buildHttpClient()` | `registerLazySingleton` | Single HTTP connection pool; swap hook for `dio` migration |
-| **1 · External** | `AppDatabase` | `AppDatabase()` | `registerLazySingleton` | One SQLite file owner for the app's lifetime |
-| **2 · Data Sources** | `SmartCampusRemoteDataSource` | `SmartCampusRemoteDataSourceImpl` | `registerLazySingleton` | Stateless; safe to share |
-| **2 · Data Sources** | `AnnouncementLocalDataSource` | `AnnouncementLocalDataSourceImpl` | `registerLazySingleton` | Stateless; shares `AppDatabase` singleton |
-| **2 · Data Sources** | `TimetableLocalDataSource` | `TimetableLocalDataSourceImpl` | `registerLazySingleton` | Stateless; shares `AppDatabase` singleton |
-| **3 · Repositories** | `AnnouncementsRepository` | `AnnouncementsRepositoryImpl` | `registerLazySingleton` | Stateless arbitrator; safe to share |
-| **3 · Repositories** | `TasksRepository` | `TasksRepositoryImpl` | `registerLazySingleton` | Stateless arbitrator; safe to share |
-| **3 · Repositories** | `UserRepository` | `UserRepositoryImpl` | `registerLazySingleton` | Remote-only; stateless |
-| **3 · Repositories** | `MapRepository` | `MapRepositoryImpl` | `registerLazySingleton` | Remote-only; stateless |
-| **3 · Repositories** | `EventsRepository` | `EventsRepositoryImpl` | `registerLazySingleton` | Remote-only; stateless |
-| **4 · BLoCs** | `ConnectivityBloc` | `ConnectivityBloc()` | **`registerLazySingleton`** | **One OS stream listener must be shared app-wide. A factory would spawn duplicate subscriptions.** |
-| **4 · BLoCs** | `AnnouncementsBloc` | `AnnouncementsBloc(repository: sl())` | **`registerFactory`** | **Stateful. Each screen navigation must receive a fresh instance. A singleton would carry stale state into newly opened screens.** |
-| **4 · BLoCs** | `TimetableBloc` | `TimetableBloc(repository: sl())` | **`registerFactory`** | **Stateful. Same rationale as `AnnouncementsBloc`.** |
-
-> **Critical Distinction:** `ConnectivityBloc` is the **only BLoC registered as a singleton**. This is not a convention   it is a correctness requirement. The BLoC's value is precisely its single, shared `StreamSubscription`. Feature BLoCs are **always** `registerFactory` because they are stateful event processors whose state must be fresh on every screen entry.
-
----
-
-## 7. Verification Results
-
-### Static Analysis
-
-```bash
-$ dart analyze lib/
-Analyzing lib...
-No issues found!
-```
-
-Result: **Zero issues** across the entire `lib/` directory, including all 16 new files and all 6 modified files produced during Sprint 3.
-
-### Domain Boundary Check
-
-```bash
-$ grep -r "drift" lib/features/*/domain/
-# (no output   CLEAN)
-
-$ grep -r "app_database" lib/features/*/domain/
-# (no output   CLEAN)
-
-$ grep -r "CacheException\|CacheFailure" lib/features/*/domain/
-# (no output   CLEAN)
-```
-
-Result: **CLEAN**. No domain directory imports or references any data-layer symbol, Drift type, or cache concept. The Dependency Inversion Principle is physically enforced.
-
-### No-Try-Catch Verification in BLoC Files
-
-```bash
-$ grep -n "try\|catch" lib/features/announcements/presentation/bloc/announcement_bloc.dart
-# (no output   CLEAN)
-
-$ grep -n "try\|catch" lib/features/timetable/presentation/bloc/timetable_bloc.dart
-# (no output   CLEAN)
-
-$ grep -n "try\|catch" lib/core/connectivity/connectivity_bloc.dart
-# (no output   CLEAN)
-```
-
-Result: **CLEAN**. No BLoC file contains a `try-catch` block. All exception handling is confined to the Repository and LocalDataSource layers where it belongs.
-
-### `build_runner` Generation
-
-```bash
-$ dart run build_runner build --delete-conflicting-outputs
-# Built with build_runner/jit in 23s; wrote 64 outputs.
-```
-
-Result: **Successful**. `app_database.g.dart` generated with correct `AnnouncementTableData`, `AnnouncementsTableCompanion`, `TimetableTableData`, and `TimetableTableCompanion` types. No analyzer warnings in generated code.
-
----
-
-## Sprint 3 Readiness Checklist   Week 4 Entry Criteria
-
-The following must remain true before beginning Sprint 4 (UI & Presentation layer implementation):
-
-- [x] `dart analyze lib/` reports zero issues with all Sprint 3 files included
-- [x] Domain boundary grep returns no results for `drift`, `app_database`, or cache symbols
-- [x] No BLoC file contains a `try-catch` block
-- [x] `ConnectivityBloc` is registered as `registerLazySingleton`; feature BLoCs as `registerFactory`
-- [x] `AppDatabase` accepts an optional `QueryExecutor` for test-time injection
-- [x] `StreamSubscription` cancelled in `ConnectivityBloc.close()`
-- [ ] `BlocProvider<ConnectivityBloc>` mounted above `MaterialApp` in `main.dart` *(Sprint 4)*
-- [ ] Shimmer loading states wired to `AnnouncementsLoading` / `TimetableLoading` *(Sprint 4)*
-- [ ] Amber offline banner wired to `DisconnectedState` *(Sprint 4)*
-- [ ] Unit tests for Repository arbitration logic with mock data sources *(Sprint 4)*
-
----
-
-*End of Sprint 3 Technical Architecture Report*
