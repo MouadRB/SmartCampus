@@ -87,7 +87,7 @@ class TimetableTable extends Table {
 
 #### `AppDatabase`   Shared Lazy Singleton
 
-`AppDatabase` is the single owner of the SQLite file on disk. It is constructed once via `registerLazySingleton` in the DI container (see Section 6). The `LazyDatabase` wrapper defers the async path resolution until the first query, satisfying Dart's synchronous constructor requirement while still supporting `async` platform calls.
+`AppDatabase` is the single owner of the SQLite file on disk. It is constructed once via `registerLazySingleton` in the DI container . The `LazyDatabase` wrapper defers the async path resolution until the first query, satisfying Dart's synchronous constructor requirement while still supporting `async` platform calls.
 
 ```dart
 @DriftDatabase(tables: [AnnouncementsTable, TimetableTable])
