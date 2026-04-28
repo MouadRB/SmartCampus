@@ -1,8 +1,3 @@
-# SmartCampus Companion — Sprint 3 Technical Report
-**Milestone:** Persistence & Synchronization — Offline-First Foundation
-**Course:** Mobile Operating Systems — Semester Project
-**Document Version:** 1.0 · **Date:** April 2026
-**Architecture Pattern:** Clean Architecture-lite (Data / Domain / Presentation)
 
 ---
 
@@ -13,8 +8,7 @@
 3. [The Arbitration Logic (The "Brain")](#3-the-arbitration-logic-the-brain)
 4. [State Management & Offline Monitoring](#4-state-management--offline-monitoring)
 5. [Safety & Correctness Measures](#5-safety--correctness-measures)
-6. [Dependency Injection Graph — Final Tier Structure](#6-dependency-injection-graph--final-tier-structure)
-7. [Verification Results](#7-verification-results)
+
 
 ---
 
@@ -39,22 +33,22 @@ Establish a local SQLite persistence layer and a global network monitoring syste
 
 | Category | New Files | Modified Files |
 |---|---|---|
-| Drift tables + database | 3 (+ 1 generated `.g.dart`) | — |
-| Exception taxonomy | — | 1 (`exceptions.dart`) |
-| Failure base class | — | 1 (`failures.dart`) |
-| Mappers | 2 | — |
-| Local data sources | 2 | — |
-| Repository implementations | — | 2 |
-| Feature BLoCs (event + state + bloc) | 6 | — |
-| Connectivity BLoC (event + state + bloc) | 3 | — |
-| Dependency injection | — | 1 |
-| `pubspec.yaml` | — | 1 |
+| Drift tables + database | 3 (+ 1 generated `.g.dart`) |   |
+| Exception taxonomy |   | 1 (`exceptions.dart`) |
+| Failure base class |   | 1 (`failures.dart`) |
+| Mappers | 2 |   |
+| Local data sources | 2 |   |
+| Repository implementations |   | 2 |
+| Feature BLoCs (event + state + bloc) | 6 |   |
+| Connectivity BLoC (event + state + bloc) | 3 |   |
+| Dependency injection |   | 1 |
+| `pubspec.yaml` |   | 1 |
 | **Total** | **16 hand-authored** | **6** |
 
 ### Verification Verdict
 
-`dart analyze lib/` — **zero issues** across the entire `lib/` directory.
-Domain boundary check — **CLEAN**: no `drift`, `datasources/local`, or cache-related symbols appear in any `domain/` directory.
+`dart analyze lib/`   **zero issues** across the entire `lib/` directory.
+Domain boundary check   **CLEAN**: no `drift`, `datasources/local`, or cache-related symbols appear in any `domain/` directory.
 
 ---
 
@@ -66,9 +60,9 @@ Domain boundary check — **CLEAN**: no `drift`, `datasources/local`, or cache-r
 
 `drift` (formerly `moor`) was selected as the mandated local database solution for three specific reasons aligned with the project's architectural constraints:
 
-1. **Type safety at compile time.** Drift generates fully typed Dart classes for every table row and query result. There are no untyped `Map<String, dynamic>` returns from the database — the same category of runtime `type cast` errors eliminated in Sprint 2 by `json_serializable` is eliminated here by `build_runner`-generated Drift code.
+1. **Type safety at compile time.** Drift generates fully typed Dart classes for every table row and query result. There are no untyped `Map<String, dynamic>` returns from the database   the same category of runtime `type cast` errors eliminated in Sprint 2 by `json_serializable` is eliminated here by `build_runner`-generated Drift code.
 
-2. **Relational model.** Unlike key-value stores (`SharedPreferences`, `flutter_secure_storage`), Drift provides a full SQL engine. This enables primary-key-based upserts, atomic multi-table transactions, and structured queries — all required for the cache invalidation and export features planned in later sprints.
+2. **Relational model.** Unlike key-value stores (`SharedPreferences`, `flutter_secure_storage`), Drift provides a full SQL engine. This enables primary-key-based upserts, atomic multi-table transactions, and structured queries   all required for the cache invalidation and export features planned in later sprints.
 
 3. **Testability.** `AppDatabase([QueryExecutor? executor])` accepts an optional executor parameter, allowing test suites to inject `NativeDatabase.memory()` without modifying any production code.
 
@@ -79,7 +73,7 @@ lib/
 └── core/
     └── datasources/
         └── local/
-            ├── app_database.dart       ← @DriftDatabase — the single shared DB instance
+            ├── app_database.dart       ← @DriftDatabase   the single shared DB instance
             ├── app_database.g.dart     ← build_runner generated (do not edit)
             └── tables/
                 ├── announcements_table.dart   ← AnnouncementsTable definition
@@ -132,7 +126,7 @@ class TimetableTable extends Table {
 }
 ```
 
-#### `AppDatabase` — Shared Lazy Singleton
+#### `AppDatabase`   Shared Lazy Singleton
 
 `AppDatabase` is the single owner of the SQLite file on disk. It is constructed once via `registerLazySingleton` in the DI container (see Section 6). The `LazyDatabase` wrapper defers the async path resolution until the first query, satisfying Dart's synchronous constructor requirement while still supporting `async` platform calls.
 
@@ -156,13 +150,13 @@ LazyDatabase _openConnection() {
 
 ---
 
-### 2.2 The Dependency Invariant — Keeping Domain Pure
+### 2.2 The Dependency Invariant   Keeping Domain Pure
 
-The non-negotiable Sprint 2 invariant — **dependencies point inward only** — was preserved throughout Sprint 3 despite introducing a third-party persistence framework. Two mechanisms enforce this physically, not by convention.
+The non-negotiable Sprint 2 invariant   **dependencies point inward only**   was preserved throughout Sprint 3 despite introducing a third-party persistence framework. Two mechanisms enforce this physically, not by convention.
 
-#### Mechanism 1: `@DataClassName` — The Naming Firewall
+#### Mechanism 1: `@DataClassName`   The Naming Firewall
 
-Drift's default code generation derives the `DataClass` name from the table class name. Without intervention, `AnnouncementsTable` would generate a class named `Announcement` — identical to the pure Domain entity — creating a naming collision and, worse, a temptation to use the Drift type in domain-layer code.
+Drift's default code generation derives the `DataClass` name from the table class name. Without intervention, `AnnouncementsTable` would generate a class named `Announcement`   identical to the pure Domain entity   creating a naming collision and, worse, a temptation to use the Drift type in domain-layer code.
 
 `@DataClassName('AnnouncementTableData')` overrides this. The generated type is `AnnouncementTableData`, which is structurally unrelated to `Announcement`. There is no pathway through which a developer could accidentally use the Drift type in domain code without an explicit import that `dart analyze` would immediately flag.
 
@@ -187,7 +181,7 @@ extension AnnouncementDataMapper on AnnouncementTableData {
 extension AnnouncementEntityMapper on Announcement {
   AnnouncementsTableCompanion toCompanion() =>
       AnnouncementsTableCompanion.insert(
-        id: Value(id),   // explicit — API-supplied IDs, not auto-increment
+        id: Value(id),   // explicit   API-supplied IDs, not auto-increment
         userId: userId,
         title: title,
         body: body,
@@ -218,7 +212,7 @@ The `RepositoryImpl` is the single point in the codebase that simultaneously hol
 
 ### 3.1 The Three-Path Cache-Fallback Strategy
 
-The arbitration logic implements a strict decision tree with three mutually exclusive branches. There is no ambiguity between paths, and every path terminates with a typed `Either<Failure, T>` — the widget tree can never receive an unhandled exception.
+The arbitration logic implements a strict decision tree with three mutually exclusive branches. There is no ambiguity between paths, and every path terminates with a typed `Either<Failure, T>`   the widget tree can never receive an unhandled exception.
 
 ```
 Remote fetch attempted
@@ -265,19 +259,19 @@ class AnnouncementsRepositoryImpl implements AnnouncementsRepository {
           List<Announcement>.from(remote),
         );
       } on CacheException catch (_) {
-        // Swallow — the user still receives the freshly-fetched data.
+        // Swallow   the user still receives the freshly-fetched data.
       }
 
       return Right(List<Announcement>.from(remote));
     } on ServerException catch (e) {
-      // Server is reachable but returned an error — do not touch the cache.
+      // Server is reachable but returned an error   do not touch the cache.
       return Left(ServerFailure(message: e.message));
     } on NetworkException catch (e) {
-      // Device is offline or the request timed out — attempt cache fallback.
+      // Device is offline or the request timed out   attempt cache fallback.
       try {
         final cached = await localDataSource.getCachedAnnouncements();
         if (cached.isEmpty) {
-          // Nothing in the cache — surface the original network error so the
+          // Nothing in the cache   surface the original network error so the
           // UI shows the offline banner with a retry prompt instead of an
           // empty screen with no explanation.
           return Left(NetworkFailure(message: e.message));
@@ -308,27 +302,27 @@ This mapping is mechanically verifiable: if a `SocketException` occurs anywhere 
 
 Two design decisions were made deliberately during Phase 2 after explicit discussion. Both are documented here so reviewers understand the intent, not just the implementation.
 
-#### Decision A — Best-Effort Cache Writes
+#### Decision A   Best-Effort Cache Writes
 
 **Decision:** If the remote fetch succeeds but the subsequent `cacheAnnouncements()` call throws a `CacheException` (e.g., disk full, database locked), the `CacheException` is swallowed and `Right(remoteData)` is returned.
 
-**Rationale:** The local cache is an optimisation, not a hard requirement. The user already has the correct, fresh data in memory. Surfacing a `Left(CacheFailure)` in this case would show an error screen to a user who just successfully received a valid API response — a confusing and incorrect user experience. The consequence of swallowing is limited: the offline fallback will not have fresh data on the next launch. That is an acceptable trade-off.
+**Rationale:** The local cache is an optimisation, not a hard requirement. The user already has the correct, fresh data in memory. Surfacing a `Left(CacheFailure)` in this case would show an error screen to a user who just successfully received a valid API response   a confusing and incorrect user experience. The consequence of swallowing is limited: the offline fallback will not have fresh data on the next launch. That is an acceptable trade-off.
 
-#### Decision B — `Left(NetworkFailure)` on Empty Cache
+#### Decision B   `Left(NetworkFailure)` on Empty Cache
 
 **Decision:** If a `NetworkException` is caught and the local cache is empty (returns `[]`), the repository returns `Left(NetworkFailure(message))` rather than `Right([])`.
 
-**Rationale:** An empty list is a valid, meaningful state that communicates "the server returned no records." Returning `Right([])` when the device is offline would cause the UI to render an empty-state widget with no error context — a user staring at "No announcements yet" with no indication that the app is offline. Returning `Left(NetworkFailure)` instead surfaces the amber offline banner and a retry prompt, which correctly communicates the situation and gives the user an action to take.
+**Rationale:** An empty list is a valid, meaningful state that communicates "the server returned no records." Returning `Right([])` when the device is offline would cause the UI to render an empty-state widget with no error context   a user staring at "No announcements yet" with no indication that the app is offline. Returning `Left(NetworkFailure)` instead surfaces the amber offline banner and a retry prompt, which correctly communicates the situation and gives the user an action to take.
 
 ---
 
 ## 4. State Management & Offline Monitoring
 
-### 4.1 `ConnectivityBloc` — Global Singleton
+### 4.1 `ConnectivityBloc`   Global Singleton
 
 #### Architecture
 
-`ConnectivityBloc` is a **self-managing** BLoC: it creates and owns its OS stream subscription internally, requiring no external event dispatches from the UI to function. All state transitions are still routed through the event system (as required by `bloc` 9.x's `emit()` constraint) — the stream listener dispatches `ConnectivityStatusChanged` events rather than calling `emit()` directly.
+`ConnectivityBloc` is a **self-managing** BLoC: it creates and owns its OS stream subscription internally, requiring no external event dispatches from the UI to function. All state transitions are still routed through the event system (as required by `bloc` 9.x's `emit()` constraint)   the stream listener dispatches `ConnectivityStatusChanged` events rather than calling `emit()` directly.
 
 ```dart
 class ConnectivityBloc extends Bloc<ConnectivityEvent, ConnectivityState> {
@@ -380,17 +374,17 @@ The device is considered online if **any** active interface reports a non-none r
 
 #### The Cold-Start Blindspot Fix
 
-`onConnectivityChanged` is a **change** stream — it only emits when the network state transitions. It does not emit an initial value when a listener subscribes. On a device with a stable connection that never changes, the BLoC would remain in `ConnectivityInitial` indefinitely without the `checkConnectivity()` call.
+`onConnectivityChanged` is a **change** stream   it only emits when the network state transitions. It does not emit an initial value when a listener subscribes. On a device with a stable connection that never changes, the BLoC would remain in `ConnectivityInitial` indefinitely without the `checkConnectivity()` call.
 
 The eager `checkConnectivity().then(...)` call in the constructor fires a `ConnectivityStatusChanged` event immediately, ensuring `ConnectivityInitial` is a millisecond-transient state resolved before the widget tree's first frame. The UI only ever needs to handle `ConnectedState` and `DisconnectedState` in practice.
 
 #### Singleton Rationale
 
-`ConnectivityBloc` is registered as `registerLazySingleton`, not `registerFactory`. If it were a factory, each `BlocProvider` or `sl<ConnectivityBloc>()` call would create a new instance — each with its own `StreamSubscription`. The app would have multiple competing OS stream listeners, each independently emitting state changes to different parts of the widget tree. One singleton guarantees exactly one subscription and one authoritative source of truth for the entire app.
+`ConnectivityBloc` is registered as `registerLazySingleton`, not `registerFactory`. If it were a factory, each `BlocProvider` or `sl<ConnectivityBloc>()` call would create a new instance   each with its own `StreamSubscription`. The app would have multiple competing OS stream listeners, each independently emitting state changes to different parts of the widget tree. One singleton guarantees exactly one subscription and one authoritative source of truth for the entire app.
 
 ---
 
-### 4.2 Feature BLoCs — `AnnouncementsBloc` and `TimetableBloc`
+### 4.2 Feature BLoCs   `AnnouncementsBloc` and `TimetableBloc`
 
 #### The 5-State Machine
 
@@ -409,7 +403,7 @@ Both feature BLoCs implement an identical state machine with five states, each m
 Both events call the same repository method and share a common private `_fetchAndEmit()` helper. Their only difference is whether a `Loading` state is emitted beforehand:
 
 - **`FetchAnnouncements`** → emits `AnnouncementsLoading` first. Used on initial screen entry. The `Loading` state triggers shimmer placeholders, giving the user a visual indication that data is being fetched from scratch.
-- **`RefreshAnnouncements`** → does **not** emit `AnnouncementsLoading`. Used by `RefreshIndicator` on pull-to-refresh. The `RefreshIndicator` widget provides its own spinner, so emitting `Loading` would replace existing content with shimmer — a disruptive and unnecessary visual transition.
+- **`RefreshAnnouncements`** → does **not** emit `AnnouncementsLoading`. Used by `RefreshIndicator` on pull-to-refresh. The `RefreshIndicator` widget provides its own spinner, so emitting `Loading` would replace existing content with shimmer   a disruptive and unnecessary visual transition.
 
 #### The No-Try-Catch Invariant
 
@@ -435,7 +429,7 @@ The `Either.fold()` call is the entire error-handling logic. The repository guar
 
 ### 5.1 `StreamSubscription` Lifecycle Management
 
-The `ConnectivityBloc`'s `StreamSubscription<List<ConnectivityResult>>` is stored as a `late final` field and explicitly cancelled in the `close()` override. This is not optional hygiene — it is a correctness requirement.
+The `ConnectivityBloc`'s `StreamSubscription<List<ConnectivityResult>>` is stored as a `late final` field and explicitly cancelled in the `close()` override. This is not optional hygiene   it is a correctness requirement.
 
 Without cancellation, the Dart runtime holds a reference from the OS stream to the `add()` method of the closed BLoC. Since `ConnectivityBloc` is a singleton registered in `GetIt`, this reference effectively lasts for the process lifetime on most platforms, preventing garbage collection of the BLoC and accumulating orphaned event dispatches if the BLoC is ever re-registered (e.g., in hot restart scenarios during development).
 
@@ -455,15 +449,15 @@ await database.transaction(() async {
 });
 ```
 
-If the app is killed between the `delete` and the `insertAll`, the transaction is rolled back by SQLite's write-ahead log. The next app launch finds the cache exactly as it was before the interrupted write — not empty, not partially written.
+If the app is killed between the `delete` and the `insertAll`, the transaction is rolled back by SQLite's write-ahead log. The next app launch finds the cache exactly as it was before the interrupted write   not empty, not partially written.
 
-### 5.3 `Equatable` on States — `BlocBuilder` Rebuild Optimisation
+### 5.3 `Equatable` on States   `BlocBuilder` Rebuild Optimisation
 
 All BLoC states extend `Equatable` and declare their payload fields in `props`. Without `Equatable`, Dart's default reference equality (`identical(a, b)`) means that two `AnnouncementsLoaded` emissions containing semantically identical lists would be treated as different objects, triggering a `BlocBuilder` rebuild even though the UI content would not change. With `Equatable`, the `BlocBuilder` performs value equality on `props`, suppressing redundant rebuilds and preventing unnecessary widget subtree invalidations.
 
 ### 5.4 `abstract String get message` on the `Failure` Base Class
 
-During Phase 3 implementation, `dart analyze` surfaced that `failure.message` was inaccessible from the abstract `Failure` type inside BLoC `fold()` handlers — `message` was defined on each concrete subclass but not on the base. The fix was a single-line addition to `failures.dart`:
+During Phase 3 implementation, `dart analyze` surfaced that `failure.message` was inaccessible from the abstract `Failure` type inside BLoC `fold()` handlers   `message` was defined on each concrete subclass but not on the base. The fix was a single-line addition to `failures.dart`:
 
 ```dart
 abstract class Failure extends Equatable {
@@ -476,7 +470,7 @@ In Dart, a `final String message` field on a concrete class implicitly satisfies
 
 ---
 
-## 6. Dependency Injection Graph — Final Tier Structure
+## 6. Dependency Injection Graph   Final Tier Structure
 
 The `injection_container.dart` `init()` function registers all dependencies in strict **bottom-up order**: each tier's registrations may only call `sl<T>()` for types registered in a lower tier. Violating this order causes a runtime `GetIt: Object not registered` exception.
 
@@ -496,7 +490,7 @@ The `injection_container.dart` `init()` function registers all dependencies in s
 | **4 · BLoCs** | `AnnouncementsBloc` | `AnnouncementsBloc(repository: sl())` | **`registerFactory`** | **Stateful. Each screen navigation must receive a fresh instance. A singleton would carry stale state into newly opened screens.** |
 | **4 · BLoCs** | `TimetableBloc` | `TimetableBloc(repository: sl())` | **`registerFactory`** | **Stateful. Same rationale as `AnnouncementsBloc`.** |
 
-> **Critical Distinction:** `ConnectivityBloc` is the **only BLoC registered as a singleton**. This is not a convention — it is a correctness requirement. The BLoC's value is precisely its single, shared `StreamSubscription`. Feature BLoCs are **always** `registerFactory` because they are stateful event processors whose state must be fresh on every screen entry.
+> **Critical Distinction:** `ConnectivityBloc` is the **only BLoC registered as a singleton**. This is not a convention   it is a correctness requirement. The BLoC's value is precisely its single, shared `StreamSubscription`. Feature BLoCs are **always** `registerFactory` because they are stateful event processors whose state must be fresh on every screen entry.
 
 ---
 
@@ -516,13 +510,13 @@ Result: **Zero issues** across the entire `lib/` directory, including all 16 new
 
 ```bash
 $ grep -r "drift" lib/features/*/domain/
-# (no output — CLEAN)
+# (no output   CLEAN)
 
 $ grep -r "app_database" lib/features/*/domain/
-# (no output — CLEAN)
+# (no output   CLEAN)
 
 $ grep -r "CacheException\|CacheFailure" lib/features/*/domain/
-# (no output — CLEAN)
+# (no output   CLEAN)
 ```
 
 Result: **CLEAN**. No domain directory imports or references any data-layer symbol, Drift type, or cache concept. The Dependency Inversion Principle is physically enforced.
@@ -531,13 +525,13 @@ Result: **CLEAN**. No domain directory imports or references any data-layer symb
 
 ```bash
 $ grep -n "try\|catch" lib/features/announcements/presentation/bloc/announcement_bloc.dart
-# (no output — CLEAN)
+# (no output   CLEAN)
 
 $ grep -n "try\|catch" lib/features/timetable/presentation/bloc/timetable_bloc.dart
-# (no output — CLEAN)
+# (no output   CLEAN)
 
 $ grep -n "try\|catch" lib/core/connectivity/connectivity_bloc.dart
-# (no output — CLEAN)
+# (no output   CLEAN)
 ```
 
 Result: **CLEAN**. No BLoC file contains a `try-catch` block. All exception handling is confined to the Repository and LocalDataSource layers where it belongs.
@@ -553,7 +547,7 @@ Result: **Successful**. `app_database.g.dart` generated with correct `Announceme
 
 ---
 
-## Sprint 3 Readiness Checklist — Week 4 Entry Criteria
+## Sprint 3 Readiness Checklist   Week 4 Entry Criteria
 
 The following must remain true before beginning Sprint 4 (UI & Presentation layer implementation):
 
