@@ -35,3 +35,16 @@ class NetworkFailure extends Failure {
   @override
   List<Object?> get props => [message];
 }
+
+/// Surfaces a denied / permanently-denied runtime permission to the
+/// Presentation layer. `permanent` lets the BLoC distinguish FR-PERM-03
+/// State B (rationale dialog + retry) from State C (settings redirect).
+class PermissionFailure extends Failure {
+  const PermissionFailure({this.message = '', this.permanent = false});
+
+  final String message;
+  final bool permanent;
+
+  @override
+  List<Object?> get props => [message, permanent];
+}
