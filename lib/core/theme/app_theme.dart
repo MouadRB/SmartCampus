@@ -54,6 +54,10 @@ class AppColors {
   static const Color purpleBg = Color(0x1AC084FC); // purple-400/10
   static const Color orange   = Color(0xFFFB923C); // orange-400
   static const Color orangeBg = Color(0x1AFB923C); // orange-400/10
+  static const Color green    = Color(0xFF4ADE80); // green-400
+  static const Color greenBg  = Color(0x1A4ADE80); // green-400/10
+  static const Color pink     = Color(0xFFF472B6); // pink-400
+  static const Color pinkBg   = Color(0x1AF472B6); // pink-400/10
 
   // ── Utility ───────────────────────────────────────────────────────────────
   static const Color surfaceOverlay = Color(0xF2171717); // zinc-900/95 — toasts/overlays

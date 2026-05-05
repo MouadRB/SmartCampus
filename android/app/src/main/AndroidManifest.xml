@@ -1,4 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Runtime location permissions. Required for permission_handler /
+         geolocator to be able to prompt the user — without these the
+         system request silently no-ops and the gate never reaches Granted.
+         GPS hardware is declared optional so the app remains installable
+         on devices without a GPS chip (e.g. Wi-Fi-only tablets). -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"/>
+
     <application
         android:label="smart_campus"
         android:name="${applicationName}"
@@ -30,6 +39,12 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Google Maps SDK key. Restrict this key in the Google Cloud
+             Console to the application bundle id + SHA-1 fingerprint so a
+             leak from the source tree is not exploitable. -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDhbAwl948n5CBaEEo3lamCl5QQRu-is2I"/>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

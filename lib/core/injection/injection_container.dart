@@ -5,8 +5,19 @@ import 'package:smart_campus/core/connectivity/connectivity_bloc.dart';
 
 import 'package:smart_campus/core/datasources/local/app_database.dart';
 import 'package:smart_campus/core/datasources/remote_data_source.dart';
+import 'package:smart_campus/features/activities/data/repositories/mock_activities_repository_impl.dart';
+import 'package:smart_campus/features/activities/domain/repositories/activities_repository.dart';
+import 'package:smart_campus/features/activities/domain/usecases/get_upcoming_activities.dart';
+import 'package:smart_campus/features/activities/presentation/bloc/activities_bloc.dart';
+import 'package:smart_campus/features/auth/data/repositories/mock_auth_repository_impl.dart';
+import 'package:smart_campus/features/auth/domain/repositories/auth_repository.dart';
+import 'package:smart_campus/features/auth/domain/usecases/get_current_user.dart';
+import 'package:smart_campus/features/auth/domain/usecases/login.dart';
+import 'package:smart_campus/features/auth/domain/usecases/logout.dart';
+import 'package:smart_campus/features/auth/domain/usecases/sign_up.dart';
+import 'package:smart_campus/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:smart_campus/features/announcements/data/datasources/announcement_local_data_source.dart';
-import 'package:smart_campus/features/announcements/data/repositories/announcements_repository_impl.dart';
+import 'package:smart_campus/features/announcements/data/repositories/mock_announcements_repository_impl.dart';
 import 'package:smart_campus/features/announcements/domain/repositories/announcements_repository.dart';
 import 'package:smart_campus/features/announcements/presentation/bloc/announcement_bloc.dart';
 import 'package:smart_campus/features/auth/data/repositories/user_repository_impl.dart';
@@ -17,6 +28,8 @@ import 'package:smart_campus/features/location/data/datasources/location_data_so
 import 'package:smart_campus/features/location/data/repositories/location_repository_impl.dart';
 import 'package:smart_campus/features/location/domain/repositories/location_repository.dart';
 import 'package:smart_campus/features/location/domain/usecases/get_current_location.dart';
+import 'package:smart_campus/features/location/domain/usecases/watch_position.dart';
+import 'package:smart_campus/features/location/presentation/bloc/location_bloc.dart';
 import 'package:smart_campus/features/map/data/repositories/map_repository_impl.dart';
 import 'package:smart_campus/features/map/domain/repositories/map_repository.dart';
 import 'package:smart_campus/features/permissions/data/datasources/permissions_data_source.dart';
@@ -86,11 +99,12 @@ Future<void> init() async {
   // Arbitrating repositories receive both a remote and a local data source.
   // Remote-only repositories (User, Map, Events) are unchanged until their
   // Phase 1 local data sources are built in a future sprint.
+  // Announcements — Constantine-2 mock impl. The JSONPlaceholder-backed
+  // real impl + drift cache are still in the codebase; flip this back to
+  // AnnouncementsRepositoryImpl(remoteDataSource: sl(), localDataSource: sl())
+  // when a real backend is ready.
   sl.registerLazySingleton<AnnouncementsRepository>(
-    () => AnnouncementsRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-    ),
+    () => MockAnnouncementsRepositoryImpl(),
   );
 
   sl.registerLazySingleton<TasksRepository>(
@@ -110,6 +124,20 @@ Future<void> init() async {
 
   sl.registerLazySingleton<EventsRepository>(
     () => EventsRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  // Activities — mock implementation, swapped for a remote/local-cache impl
+  // when the catalogue endpoint lands. Registered against the Domain
+  // interface so callers depend only on the contract.
+  sl.registerLazySingleton<ActivitiesRepository>(
+    () => MockActivitiesRepositoryImpl(),
+  );
+
+  // Auth — fully mock for now. Holds in-memory state (registered accounts +
+  // current session) so it MUST be a singleton; a factory would wipe state
+  // on every sl<>() call.
+  sl.registerLazySingleton<AuthRepository>(
+    () => MockAuthRepositoryImpl(),
   );
 
   // Hardware repositories (Week 4). LocationRepository composes
@@ -134,6 +162,14 @@ Future<void> init() async {
   sl.registerLazySingleton<RequestPermission>(() => RequestPermission(sl()));
   sl.registerLazySingleton<OpenAppSettings>(() => OpenAppSettings(sl()));
   sl.registerLazySingleton<GetCurrentLocation>(() => GetCurrentLocation(sl()));
+  sl.registerLazySingleton<WatchPosition>(() => WatchPosition(sl()));
+  sl.registerLazySingleton<GetUpcomingActivities>(
+    () => GetUpcomingActivities(sl()),
+  );
+  sl.registerLazySingleton<SignUp>(() => SignUp(sl()));
+  sl.registerLazySingleton<Login>(() => Login(sl()));
+  sl.registerLazySingleton<Logout>(() => Logout(sl()));
+  sl.registerLazySingleton<GetCurrentUser>(() => GetCurrentUser(sl()));
 
   // ── 4. BLoCs ───────────────────────────────────────────────────────────────
   //
@@ -142,13 +178,14 @@ Future<void> init() async {
   // call, creating duplicate events and wasting OS resources.
   sl.registerLazySingleton<ConnectivityBloc>(() => ConnectivityBloc());
 
-  // Feature BLoCs use registerFactory: a new instance is created on every
-  // sl() call so stale state never bleeds into a newly opened screen.
-  sl.registerFactory<AnnouncementsBloc>(
+  // Feature BLoCs are singletons because the root MultiBlocProvider exposes
+  // them via .value() — a factory would yield a fresh instance on every
+  // parent rebuild and orphan the previous one.
+  sl.registerLazySingleton<AnnouncementsBloc>(
     () => AnnouncementsBloc(repository: sl()),
   );
 
-  sl.registerFactory<TimetableBloc>(
+  sl.registerLazySingleton<TimetableBloc>(
     () => TimetableBloc(repository: sl()),
   );
 
@@ -161,6 +198,31 @@ Future<void> init() async {
       requestPermission: sl(),
       openAppSettings: sl(),
     ),
+  );
+
+  // LocationBloc owns a StreamSubscription that the OS GPS listener feeds
+  // — a factory ensures every CampusMapPage gets a fresh subscription that
+  // dies cleanly when the route is popped. NEVER add this to the root
+  // MultiBlocProvider: a global instance would keep the OS listener alive
+  // for the lifetime of the app and drain battery.
+  sl.registerFactory<LocationBloc>(
+    () => LocationBloc(
+      getCurrentLocation: sl(),
+      watchPosition: sl(),
+    ),
+  );
+
+  // ActivitiesBloc is a singleton so the home dashboard's Load Mocks button
+  // and the Events tab share the same loaded list. Stateless w.r.t. the OS
+  // (no streams/subscriptions) so a singleton is safe.
+  sl.registerLazySingleton<ActivitiesBloc>(
+    () => ActivitiesBloc(repository: sl()),
+  );
+
+  // AuthBloc is a singleton because the AuthGate listens app-wide and
+  // every authenticated screen reads from the same session state.
+  sl.registerLazySingleton<AuthBloc>(
+    () => AuthBloc(repository: sl()),
   );
 }
 

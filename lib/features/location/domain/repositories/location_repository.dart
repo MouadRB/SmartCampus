@@ -10,9 +10,6 @@ import 'package:smart_campus/features/location/domain/entities/coordinates.dart'
 /// when the user has not granted Location. Presentation never has to chain
 /// a permission check before requesting coordinates.
 ///
-/// Streaming (`watchPosition`) is intentionally deferred to the Campus Map
-/// task in Week 4-mid; until then this interface only exposes a one-shot
-/// `getCurrentPosition` method.
 abstract class LocationRepository {
   /// Returns the user's current position as a single fix.
   ///
@@ -25,4 +22,11 @@ abstract class LocationRepository {
   ///     disabled at the OS level (treated as a server-class failure since
   ///     it is not a network problem and not a permission problem).
   Future<Either<Failure, Coordinates>> getCurrentPosition();
+
+  /// Continuous fix stream, gated on permission state in exactly the same
+  /// way as [getCurrentPosition]. Each emission is an [Either] so subscribers
+  /// can handle a denied permission or a service-disabled error mid-stream
+  /// without try/catch. The underlying OS subscription is owned by the
+  /// caller's `StreamSubscription` and must be cancelled to stop sampling.
+  Stream<Either<Failure, Coordinates>> watchPosition();
 }

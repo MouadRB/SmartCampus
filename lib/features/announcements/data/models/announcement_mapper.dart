@@ -12,6 +12,10 @@ extension AnnouncementDataMapper on AnnouncementTableData {
         userId: userId,
         title: title,
         body: body,
+        // Drift schema predates the publishedAt column. The legacy
+        // JSONPlaceholder cache path is unregistered today; this default
+        // keeps the mapper compiling without a schema migration.
+        publishedAt: DateTime.now(),
       );
 }
 

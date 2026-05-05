@@ -48,3 +48,44 @@ class PermissionFailure extends Failure {
   @override
   List<Object?> get props => [message, permanent];
 }
+
+// ── Auth failures (mock-backed for now; same shape will fit a real backend).
+
+class InvalidCredentialsFailure extends Failure {
+  const InvalidCredentialsFailure(
+      {this.message = 'Invalid email or password'});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class EmailAlreadyRegisteredFailure extends Failure {
+  const EmailAlreadyRegisteredFailure(
+      {this.message = 'An account with this email already exists'});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class WeakPasswordFailure extends Failure {
+  const WeakPasswordFailure(
+      {this.message = 'Password must be at least 6 characters'});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class InvalidEmailFailure extends Failure {
+  const InvalidEmailFailure({this.message = 'Enter a valid email address'});
+
+  final String message;
+
+  @override
+  List<Object?> get props => [message];
+}

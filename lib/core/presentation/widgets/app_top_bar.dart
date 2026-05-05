@@ -20,6 +20,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.onLeft,
     this.rightIcon,
     this.onRight,
+    this.extraRightIcon,
+    this.onExtraRight,
     this.showBadge = false,
   });
 
@@ -32,6 +34,11 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   /// Widget rendered in the 40-px right slot (typically a bell icon).
   final Widget? rightIcon;
   final VoidCallback? onRight;
+
+  /// Optional second right-side icon, rendered to the LEFT of [rightIcon].
+  /// Used by the dashboard for the "Load Mocks" affordance.
+  final Widget? extraRightIcon;
+  final VoidCallback? onExtraRight;
 
   /// When true, renders the 8-px neon-yellow notification dot with glow
   /// in the top-right corner of the right icon slot.
@@ -97,6 +104,21 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     child: Text(title, style: AppTextStyles.appBarTitle),
                   ),
                 ),
+
+                // ── Optional extra right slot (40 dp wide) ──────────────
+                if (extraRightIcon != null)
+                  SizedBox(
+                    width: 40.w,
+                    child: IconButton(
+                      onPressed: onExtraRight,
+                      icon: extraRightIcon!,
+                      iconSize: 22.r,
+                      color: AppColors.textSecondary,
+                      padding: EdgeInsets.all(6.r),
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                  ),
 
                 // ── Right slot (40 dp wide) with optional badge ─────────
                 SizedBox(
