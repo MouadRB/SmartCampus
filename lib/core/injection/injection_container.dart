@@ -13,8 +13,19 @@ import 'package:smart_campus/features/auth/data/repositories/user_repository_imp
 import 'package:smart_campus/features/auth/domain/repositories/user_repository.dart';
 import 'package:smart_campus/features/events/data/repositories/events_repository_impl.dart';
 import 'package:smart_campus/features/events/domain/repositories/events_repository.dart';
+import 'package:smart_campus/features/location/data/datasources/location_data_source.dart';
+import 'package:smart_campus/features/location/data/repositories/location_repository_impl.dart';
+import 'package:smart_campus/features/location/domain/repositories/location_repository.dart';
+import 'package:smart_campus/features/location/domain/usecases/get_current_location.dart';
 import 'package:smart_campus/features/map/data/repositories/map_repository_impl.dart';
 import 'package:smart_campus/features/map/domain/repositories/map_repository.dart';
+import 'package:smart_campus/features/permissions/data/datasources/permissions_data_source.dart';
+import 'package:smart_campus/features/permissions/data/repositories/permissions_repository_impl.dart';
+import 'package:smart_campus/features/permissions/domain/repositories/permissions_repository.dart';
+import 'package:smart_campus/features/permissions/domain/usecases/check_permission.dart';
+import 'package:smart_campus/features/permissions/domain/usecases/open_app_settings.dart';
+import 'package:smart_campus/features/permissions/domain/usecases/request_permission.dart';
+import 'package:smart_campus/features/permissions/presentation/bloc/permissions_bloc.dart';
 import 'package:smart_campus/features/timetable/data/datasources/timetable_local_data_source.dart';
 import 'package:smart_campus/features/timetable/data/repositories/tasks_repository_impl.dart';
 import 'package:smart_campus/features/timetable/domain/repositories/tasks_repository.dart';
@@ -59,6 +70,16 @@ Future<void> init() async {
     () => TimetableLocalDataSourceImpl(database: sl()),
   );
 
+  // Hardware data sources (Week 4) — thin wrappers over permission_handler
+  // and geolocator. Both are stateless, so registerLazySingleton is correct.
+  sl.registerLazySingleton<PermissionsDataSource>(
+    () => const PermissionsDataSourceImpl(),
+  );
+
+  sl.registerLazySingleton<LocationDataSource>(
+    () => const LocationDataSourceImpl(),
+  );
+
   // ── 3. Repositories ────────────────────────────────────────────────────────
   //
   // Each implementation is registered under its domain interface.
@@ -91,6 +112,29 @@ Future<void> init() async {
     () => EventsRepositoryImpl(remoteDataSource: sl()),
   );
 
+  // Hardware repositories (Week 4). LocationRepository composes
+  // PermissionsRepository so callers never need to chain a permission check
+  // before requesting coordinates.
+  sl.registerLazySingleton<PermissionsRepository>(
+    () => PermissionsRepositoryImpl(dataSource: sl()),
+  );
+
+  sl.registerLazySingleton<LocationRepository>(
+    () => LocationRepositoryImpl(
+      permissionsRepository: sl(),
+      dataSource: sl(),
+    ),
+  );
+
+  // ── 3.5 Use Cases ──────────────────────────────────────────────────────────
+  //
+  // Lightweight wrappers over single repository methods. Registered as
+  // singletons because they hold no state.
+  sl.registerLazySingleton<CheckPermission>(() => CheckPermission(sl()));
+  sl.registerLazySingleton<RequestPermission>(() => RequestPermission(sl()));
+  sl.registerLazySingleton<OpenAppSettings>(() => OpenAppSettings(sl()));
+  sl.registerLazySingleton<GetCurrentLocation>(() => GetCurrentLocation(sl()));
+
   // ── 4. BLoCs ───────────────────────────────────────────────────────────────
   //
   // ConnectivityBloc is a SINGLETON: the entire app must share one OS stream
@@ -106,6 +150,17 @@ Future<void> init() async {
 
   sl.registerFactory<TimetableBloc>(
     () => TimetableBloc(repository: sl()),
+  );
+
+  // PermissionsBloc is a factory so each gate widget gets a fresh state
+  // machine. Multiple concurrent gates (e.g., Map + Camera) operate
+  // independently and do not bleed state across each other.
+  sl.registerFactory<PermissionsBloc>(
+    () => PermissionsBloc(
+      checkPermission: sl(),
+      requestPermission: sl(),
+      openAppSettings: sl(),
+    ),
   );
 }
 
