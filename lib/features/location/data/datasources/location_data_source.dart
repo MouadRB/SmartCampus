@@ -10,6 +10,11 @@ import 'package:smart_campus/features/location/domain/entities/coordinates.dart'
 /// Repository translates them into [Failure]s.
 abstract class LocationDataSource {
   Future<Coordinates> getCurrentPosition();
+
+  /// Continuous fix stream. Surfaces every position update emitted by the OS
+  /// after the supplied [distanceFilterMeters] has been travelled. The
+  /// Repository wraps this for permission gating and Either translation.
+  Stream<Coordinates> watchPosition({int distanceFilterMeters = 5});
 }
 
 class LocationDataSourceImpl implements LocationDataSource {
@@ -33,5 +38,21 @@ class LocationDataSourceImpl implements LocationDataSource {
       // app-level exception so the Repository can translate uniformly.
       throw PermissionDeniedException(message: e.message ?? 'Permission denied');
     }
+  }
+
+  @override
+  Stream<Coordinates> watchPosition({int distanceFilterMeters = 5}) async* {
+    final servicesEnabled = await geo.Geolocator.isLocationServiceEnabled();
+    if (!servicesEnabled) {
+      throw const LocationServiceDisabledException();
+    }
+
+    final settings = geo.LocationSettings(
+      accuracy: geo.LocationAccuracy.high,
+      distanceFilter: distanceFilterMeters,
+    );
+
+    yield* geo.Geolocator.getPositionStream(locationSettings: settings)
+        .map((position) => position.toDomain());
   }
 }

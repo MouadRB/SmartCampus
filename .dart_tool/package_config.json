@@ -146,6 +146,12 @@
       "languageVersion": "3.4"
     },
     {
+      "name": "csslib",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/csslib-1.0.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
       "name": "dart_style",
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/dart_style-3.1.7",
       "packageUri": "lib/",
@@ -218,6 +224,12 @@
       "languageVersion": "2.14"
     },
     {
+      "name": "flutter_plugin_android_lifecycle",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.34",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
       "name": "flutter_screenutil",
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/flutter_screenutil-5.9.3",
       "packageUri": "lib/",
@@ -284,6 +296,42 @@
       "languageVersion": "3.3"
     },
     {
+      "name": "google_maps",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/google_maps-8.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
+      "name": "google_maps_flutter",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/google_maps_flutter-2.17.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "google_maps_flutter_android",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/google_maps_flutter_android-2.19.8",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "google_maps_flutter_ios",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/google_maps_flutter_ios-2.18.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "google_maps_flutter_platform_interface",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/google_maps_flutter_platform_interface-2.15.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
+      "name": "google_maps_flutter_web",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/google_maps_flutter_web-0.6.2+1",
+      "packageUri": "lib/",
+      "languageVersion": "3.9"
+    },
+    {
       "name": "graphs",
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/graphs-2.3.2",
       "packageUri": "lib/",
@@ -294,6 +342,12 @@
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/hooks-1.0.3",
       "packageUri": "lib/",
       "languageVersion": "3.10"
+    },
+    {
+      "name": "html",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/html-0.15.6",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
     },
     {
       "name": "http",
@@ -312,6 +366,12 @@
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/http_parser-4.1.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "intl",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/intl-0.20.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
     },
     {
       "name": "io",
@@ -554,6 +614,12 @@
       "languageVersion": "3.10"
     },
     {
+      "name": "sanitize_html",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/sanitize_html-2.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "shelf",
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/shelf-1.4.2",
       "packageUri": "lib/",
@@ -564,6 +630,18 @@
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/shelf_web_socket-3.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "shimmer",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/shimmer-3.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.17"
+    },
+    {
+      "name": "simple_gesture_detector",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/simple_gesture_detector-0.2.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "sky_engine",
@@ -630,6 +708,12 @@
       "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/string_scanner-1.4.1",
       "packageUri": "lib/",
       "languageVersion": "3.1"
+    },
+    {
+      "name": "table_calendar",
+      "rootUri": "file:///home/mouad/.pub-cache/hosted/pub.dev/table_calendar-3.2.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "term_glyph",

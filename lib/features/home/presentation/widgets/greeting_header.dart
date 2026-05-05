@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_campus/core/connectivity/connectivity_bloc.dart';
 import 'package:smart_campus/core/connectivity/connectivity_state.dart';
 import 'package:smart_campus/core/theme/app_theme.dart';
+import 'package:smart_campus/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:smart_campus/features/auth/presentation/bloc/auth_state.dart';
 
 class GreetingHeader extends StatelessWidget {
   const GreetingHeader({super.key});
@@ -53,24 +55,41 @@ class GreetingHeader extends StatelessWidget {
       builder: (context, state) {
         final isOffline = state is DisconnectedState;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(_dateLabel, style: AppTextStyles.greetingDate),
-            SizedBox(height: 2.h),
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 8.w,
-              runSpacing: 4.h,
+        return BlocBuilder<AuthBloc, AuthState>(
+          buildWhen: (p, c) =>
+              p is! Authenticated || c is! Authenticated ||
+              (p).user.name != (c).user.name,
+          builder: (context, authState) {
+            final name = _firstName(authState);
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$_greeting, Student', style: AppTextStyles.greetingName),
-                if (isOffline) const _CachedPill(),
+                Text(_dateLabel, style: AppTextStyles.greetingDate),
+                SizedBox(height: 2.h),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8.w,
+                  runSpacing: 4.h,
+                  children: [
+                    Text('$_greeting, $name',
+                        style: AppTextStyles.greetingName),
+                    if (isOffline) const _CachedPill(),
+                  ],
+                ),
               ],
-            ),
-          ],
+            );
+          },
         );
       },
     );
+  }
+
+  String _firstName(AuthState state) {
+    if (state is! Authenticated) return 'Student';
+    final raw = state.user.name.trim();
+    if (raw.isEmpty) return 'Student';
+    final first = raw.split(RegExp(r'\s+')).first;
+    return first[0].toUpperCase() + first.substring(1);
   }
 }
 

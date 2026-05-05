@@ -49,6 +49,40 @@ class LocationRepositoryImpl implements LocationRepository {
     }
   }
 
+  @override
+  Stream<Either<Failure, Coordinates>> watchPosition() async* {
+    // 1. Resolve permission once at subscription time. A denial yields a
+    //    single Left and closes the stream — the caller's bloc transitions
+    //    to LocationDenied without any try/catch.
+    final permission = await _resolveLocationPermission();
+    if (permission.isLeft()) {
+      yield permission.fold<Either<Failure, Coordinates>>(
+        (failure) => Left(failure),
+        (_) => throw StateError('unreachable'),
+      );
+      return;
+    }
+
+    // 2. Forward each upstream fix as a Right; translate any sensor-side
+    //    error into the appropriate Left and close. `await for` lets us
+    //    catch typed exceptions without losing the back-pressure semantics
+    //    of yield*.
+    try {
+      await for (final coords in dataSource.watchPosition()) {
+        yield Right(coords);
+      }
+    } on PermissionDeniedException catch (e) {
+      // Permission was revoked mid-stream (rare but possible on Android).
+      yield Left(
+        PermissionFailure(message: e.message, permanent: e.permanent),
+      );
+    } on LocationServiceDisabledException catch (e) {
+      yield Left(ServerFailure(message: e.message));
+    } catch (e) {
+      yield Left(ServerFailure(message: e.toString()));
+    }
+  }
+
   /// Returns `Right(granted)` only when the user has actively granted the
   /// Location permission (after a request if necessary). Every other
   /// outcome — denied, permanently denied, package error — is surfaced as

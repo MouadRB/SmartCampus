@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:smart_campus/core/theme/app_theme.dart';
+import 'package:smart_campus/features/activities/presentation/pages/activities_page.dart';
 import 'package:smart_campus/features/timetable/domain/entities/campus_task.dart';
 import 'package:smart_campus/features/timetable/presentation/bloc/timetable_bloc.dart';
 import 'package:smart_campus/features/timetable/presentation/bloc/timetable_state.dart';
@@ -17,7 +18,14 @@ class UpcomingEventsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader(title: 'Upcoming Events'),
+        _SectionHeader(
+          title: 'Upcoming Events',
+          onSeeAll: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const ActivitiesPage(),
+            ),
+          ),
+        ),
         SizedBox(height: 12.h),
         BlocBuilder<TimetableBloc, TimetableState>(
           builder: (context, state) {
@@ -43,9 +51,10 @@ class UpcomingEventsSection extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+  const _SectionHeader({required this.title, required this.onSeeAll});
 
   final String title;
+  final VoidCallback onSeeAll;
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +62,16 @@ class _SectionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: AppTextStyles.sectionHeader),
-        Text(
-          'See All',
-          style: AppTextStyles.navLabel.copyWith(color: AppColors.accent),
+        InkWell(
+          onTap: onSeeAll,
+          borderRadius: BorderRadius.circular(999),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
+            child: Text(
+              'See All',
+              style: AppTextStyles.navLabel.copyWith(color: AppColors.accent),
+            ),
+          ),
         ),
       ],
     );
